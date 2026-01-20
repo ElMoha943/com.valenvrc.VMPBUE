@@ -1,6 +1,10 @@
 # Val's Material Property Block Udon Editor (VMPBUE) tool.
 This tool is desgined to help you asign and apply material property blocks on your vrchat scene.
 
+### Installation
+
+You can download the latest version of the tool from the [releases page](https://github.com/elmoha943/VMPBUE/releases) or get it directly on your VCC/Alcom from my [package listing](https://valenvrc.com).
+
 ### Usage
 
 1. Drag and drop mesh renderers into the editor script to access and modify the different properties of their materials.

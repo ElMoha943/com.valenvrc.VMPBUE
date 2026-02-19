@@ -2,22 +2,355 @@
     "renderers": [
         {
             "renderer": {
-                "instanceID": 45196
+                "instanceID": 676482
             },
             "materials": [
                 {
                     "material": {
-                        "instanceID": 30642
+                        "instanceID": 32184
                     },
                     "properties": [
                         {
-                            "name": "_Color",
+                            "name": "_EmissionColor",
                             "type": 0,
                             "floatValue": 0.0,
                             "colorValue": {
                                 "r": 1.0,
-                                "g": 0.8173367977142334,
+                                "g": 0.9398437738418579,
                                 "b": 0.0,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 660542
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 0.0,
+                                "g": 1.0,
+                                "b": 0.3960268497467041,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 663882
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 0.0,
+                                "g": 0.6602616310119629,
+                                "b": 1.0,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 659774
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 1.0,
+                                "g": 0.0,
+                                "b": 0.6627955436706543,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 659594
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 0.745978832244873,
+                                "g": 0.0,
+                                "b": 1.0,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 662242
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 1.0,
+                                "g": 0.0,
+                                "b": 0.0,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 674774
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 0.3764706254005432,
+                                "g": 1.0,
+                                "b": 0.0,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 664772
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 0.0,
+                                "g": 0.6090965270996094,
+                                "b": 1.0,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 658928
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 1.0,
+                                "g": 0.0,
+                                "b": 0.6640019416809082,
+                                "a": 1.0
+                            },
+                            "vectorValue": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0,
+                                "w": 0.0
+                            },
+                            "textureValue": {
+                                "instanceID": 0
+                            }
+                        }
+                    ],
+                    "foldout": true
+                }
+            ],
+            "foldout": true,
+            "hasPendingChanges": false
+        },
+        {
+            "renderer": {
+                "instanceID": 656930
+            },
+            "materials": [
+                {
+                    "material": {
+                        "instanceID": 32184
+                    },
+                    "properties": [
+                        {
+                            "name": "_EmissionColor",
+                            "type": 0,
+                            "floatValue": 0.0,
+                            "colorValue": {
+                                "r": 0.6082630157470703,
+                                "g": 0.0,
+                                "b": 1.0,
                                 "a": 1.0
                             },
                             "vectorValue": {

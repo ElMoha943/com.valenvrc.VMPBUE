@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.SceneManagement;
+using UnityEditor.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -55,16 +57,19 @@ namespace valenvrc.Tools.MPB
         }
         
         private const string CONFIG_PATH = "Packages/com.valenvrc.VMPBUE/Editor/MPBConfig.json";
+        private const string APPLIER_PREF_KEY = "MPBEditor_ApplierInstanceID";
         
         private MPBConfig config = new MPBConfig();
         private Vector2 leftScrollPosition;
         private Vector2 rightScrollPosition;
         private int selectedRendererIndex = -1;
+        private MPBApplierTool applierToImport;
         
         // Static constructor for InitializeOnLoad
         static MPBEditor()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChangedStatic;
+            EditorSceneManager.sceneOpened += OnSceneOpenedStatic;
         }
         
         private static void OnPlayModeStateChangedStatic(PlayModeStateChange state)
@@ -73,6 +78,41 @@ namespace valenvrc.Tools.MPB
             {
                 // Reapply all property blocks after exiting play mode
                 ApplyToAllStatic();
+                ApplyFromPersistedApplier();
+            }
+        }
+        
+        private static void OnSceneOpenedStatic(Scene scene, OpenSceneMode mode)
+        {
+            EditorApplication.delayCall += ApplyFromPersistedApplier;
+        }
+        
+        private static void ApplyFromPersistedApplier()
+        {
+            if (!EditorPrefs.HasKey(APPLIER_PREF_KEY))
+                return;
+            
+            int instanceID = EditorPrefs.GetInt(APPLIER_PREF_KEY, 0);
+            if (instanceID == 0)
+                return;
+            
+            MPBApplierTool applier = EditorUtility.InstanceIDToObject(instanceID) as MPBApplierTool;
+            if (applier != null && applier.meshes != null && applier.meshes.Length > 0)
+            {
+                int appliedMeshes = 0;
+                foreach (MPBMesh mesh in applier.meshes)
+                {
+                    if (mesh != null)
+                    {
+                        mesh.ApplyAllMaterials();
+                        appliedMeshes++;
+                    }
+                }
+                
+                if (appliedMeshes > 0)
+                {
+                    Debug.Log($"[MPBEditor] Auto-applied {appliedMeshes} mesh(es) from persisted applier: {applier.name}");
+                }
             }
         }
         
@@ -147,11 +187,37 @@ namespace valenvrc.Tools.MPB
         private void OnEnable()
         {
             LoadConfig();
+            LoadPersistedApplier();
         }
         
         private void OnDisable()
         {
             SaveConfig();
+            SavePersistedApplier();
+        }
+        
+        private void LoadPersistedApplier()
+        {
+            if (EditorPrefs.HasKey(APPLIER_PREF_KEY))
+            {
+                int instanceID = EditorPrefs.GetInt(APPLIER_PREF_KEY, 0);
+                if (instanceID != 0)
+                {
+                    applierToImport = EditorUtility.InstanceIDToObject(instanceID) as MPBApplierTool;
+                }
+            }
+        }
+        
+        private void SavePersistedApplier()
+        {
+            if (applierToImport != null)
+            {
+                EditorPrefs.SetInt(APPLIER_PREF_KEY, applierToImport.GetInstanceID());
+            }
+            else
+            {
+                EditorPrefs.DeleteKey(APPLIER_PREF_KEY);
+            }
         }
         
         private void OnPlayModeStateChanged(PlayModeStateChange state)
@@ -177,6 +243,14 @@ namespace valenvrc.Tools.MPB
             
             EditorGUILayout.Space(10);
             
+            // Import from Udon section
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Import from:", GUILayout.Width(80));
+            applierToImport = (MPBApplierTool)EditorGUILayout.ObjectField(applierToImport, typeof(MPBApplierTool), true);
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.Space(5);
+            
             EditorGUILayout.BeginHorizontal();
             
             if (GUILayout.Button("Apply to All", GUILayout.Height(30)))
@@ -188,6 +262,13 @@ namespace valenvrc.Tools.MPB
             {
                 ExportToUdon();
             }
+            
+            EditorGUI.BeginDisabledGroup(applierToImport == null);
+            if (GUILayout.Button("Import from Udon", GUILayout.Height(30)))
+            {
+                ImportFromUdon();
+            }
+            EditorGUI.EndDisabledGroup();
             
             if (GUILayout.Button("Clear All", GUILayout.Height(30)))
             {
@@ -641,10 +722,163 @@ namespace valenvrc.Tools.MPB
             Debug.Log($"Applied properties to {config.renderers.Count} renderers");
         }
         
+        private void ImportFromUdon()
+        {
+            if (applierToImport == null)
+            {
+                EditorUtility.DisplayDialog("Import Error", "Please select an MPB Applier to import from.", "OK");
+                return;
+            }
+            
+            if (applierToImport.meshes == null || applierToImport.meshes.Length == 0)
+            {
+                EditorUtility.DisplayDialog("Import Error", "The selected MPB Applier has no meshes to import.", "OK");
+                return;
+            }
+            
+            bool clearExisting = EditorUtility.DisplayDialog(
+                "Import from Udon",
+                "Do you want to clear existing configuration before importing?",
+                "Clear and Import",
+                "Merge with Existing"
+            );
+            
+            if (clearExisting)
+            {
+                config.renderers.Clear();
+                selectedRendererIndex = -1;
+            }
+            
+            int importedMeshes = 0;
+            int importedMaterials = 0;
+            
+            foreach (MPBMesh mpbMesh in applierToImport.meshes)
+            {
+                if (mpbMesh == null || mpbMesh.targetRenderer == null)
+                    continue;
+                
+                // Check if renderer already exists in config
+                RendererConfig rendererConfig = config.renderers.FirstOrDefault(r => r.renderer == mpbMesh.targetRenderer);
+                
+                if (rendererConfig == null)
+                {
+                    rendererConfig = new RendererConfig
+                    {
+                        renderer = mpbMesh.targetRenderer,
+                        foldout = true,
+                        hasPendingChanges = false
+                    };
+                    config.renderers.Add(rendererConfig);
+                }
+                
+                // Process materials
+                if (mpbMesh.materials != null)
+                {
+                    foreach (MPBMaterial mpbMaterial in mpbMesh.materials)
+                    {
+                        if (mpbMaterial == null || mpbMaterial.material == null)
+                            continue;
+                        
+                        // Check if material already exists in the renderer config
+                        MaterialConfig matConfig = rendererConfig.materials.FirstOrDefault(m => m.material == mpbMaterial.material);
+                        
+                        if (matConfig == null)
+                        {
+                            matConfig = new MaterialConfig
+                            {
+                                material = mpbMaterial.material,
+                                foldout = true
+                            };
+                            rendererConfig.materials.Add(matConfig);
+                        }
+                        else
+                        {
+                            // Clear existing properties to replace them
+                            matConfig.properties.Clear();
+                        }
+                        
+                        // Import properties
+                        if (mpbMaterial.propertyNames != null)
+                        {
+                            for (int i = 0; i < mpbMaterial.propertyNames.Length; i++)
+                            {
+                                string propName = mpbMaterial.propertyNames[i];
+                                int propType = mpbMaterial.propertyTypes[i];
+                                
+                                ShaderProperty shaderProp = new ShaderProperty(propName, (ShaderUtil.ShaderPropertyType)propType);
+                                
+                                // Set the appropriate value based on type
+                                switch (propType)
+                                {
+                                    case 0: // Color
+                                        if (i < mpbMaterial.colorValues.Length)
+                                            shaderProp.colorValue = mpbMaterial.colorValues[i];
+                                        break;
+                                    case 1: // Vector
+                                        if (i < mpbMaterial.vectorValues.Length)
+                                            shaderProp.vectorValue = mpbMaterial.vectorValues[i];
+                                        break;
+                                    case 2: // Float
+                                    case 3: // Range
+                                        if (i < mpbMaterial.floatValues.Length)
+                                            shaderProp.floatValue = mpbMaterial.floatValues[i];
+                                        break;
+                                    case 4: // Texture
+                                        if (i < mpbMaterial.textureValues.Length)
+                                            shaderProp.textureValue = mpbMaterial.textureValues[i];
+                                        break;
+                                }
+                                
+                                matConfig.properties.Add(shaderProp);
+                            }
+                        }
+                        
+                        importedMaterials++;
+                    }
+                }
+                
+                importedMeshes++;
+            }
+            
+            SaveConfig();
+            Repaint();
+            
+            EditorUtility.DisplayDialog(
+                "Import Complete",
+                $"Successfully imported {importedMeshes} mesh(es) with {importedMaterials} material(s).",
+                "OK"
+            );
+            
+            Debug.Log($"[MPBEditor] Imported {importedMeshes} meshes with {importedMaterials} materials from {applierToImport.name}");
+        }
+        
         private void ExportToUdon()
         {
-            GameObject applierObj = new GameObject("MPB Applier");
-            MPBApplierTool applier = applierObj.AddUdonSharpComponent<MPBApplierTool>();
+            GameObject applierObj;
+            MPBApplierTool applier;
+            bool isNewApplier = false;
+            
+            // Use existing applier if assigned, otherwise create a new one
+            if (applierToImport != null)
+            {
+                applier = applierToImport;
+                applierObj = applier.gameObject;
+                
+                // Clear existing child objects
+                for (int i = applierObj.transform.childCount - 1; i >= 0; i--)
+                {
+                    Object.DestroyImmediate(applierObj.transform.GetChild(i).gameObject);
+                }
+                
+                Debug.Log($"[MPBEditor] Reusing existing MPB Applier: {applierObj.name}");
+            }
+            else
+            {
+                applierObj = new GameObject("MPB Applier");
+                applier = applierObj.AddUdonSharpComponent<MPBApplierTool>();
+                isNewApplier = true;
+                Debug.Log($"[MPBEditor] Created new MPB Applier");
+            }
             
             List<MPBMesh> meshList = new List<MPBMesh>();
             
@@ -706,7 +940,8 @@ namespace valenvrc.Tools.MPB
             Selection.activeGameObject = applierObj;
             EditorGUIUtility.PingObject(applierObj);
             
-            Debug.Log($"Created MPB Applier GameObject with {meshList.Count} meshes");
+            string actionText = isNewApplier ? "Created" : "Updated";
+            Debug.Log($"{actionText} MPB Applier GameObject with {meshList.Count} meshes");
         }
         
         private void SaveConfig()

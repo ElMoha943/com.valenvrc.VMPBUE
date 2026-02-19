@@ -1,6 +1,6 @@
 {
   "name": "com.valenvrc.vmpbue",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A tool for applying Material Property Blocks (MPB) to multiple objects in Unity, designed for VRChat Udon worlds.",
   "displayName": "Valenvrc - MPB Editor",
   "author": {
